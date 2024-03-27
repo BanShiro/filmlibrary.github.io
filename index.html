@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="./assets/library/owl/owl.carousel.min.css" />
+    <link rel="stylesheet" href="./assets/css/style.css" />
+    <title>Projet Vue JS</title>
+  </head>
+  <body>
+    <main id="app">
+      <section id="Header">
+        <header id="nav">
+          <nav class="navbar">
+            <div class="navleft">
+              <a class="navbar-brand"
+                ><img
+                  id="logo-top"
+                  style="height: 50px; width: 65px"
+                  src="./assets/img/logo_ost.png"
+                  alt="logo"
+              /></a>
+              <a id="nav-text" href="#affiche">A l'affiche</a>
+              <a id="nav-text" href="#pop">Populaires</a>
+              <a id="nav-text" href="#Contact">Contact</a>
+            </div>
+            <div class="navright">
+              <form class="form-inline" @click.stop.prevent>
+                <div class="popopo">
+                  <button class="btn my-2 my-sm-0 logo" type="submit">
+                    <img src="./assets/img/loupe.png" alt="logo search" />
+                  </button>
+                  <input
+                    style="
+                      color: white;
+                      background-color: #25252500;
+                      border-top: none;
+                      border-left: none;
+                      border-right: none;
+                      border-bottom-color: rgb(255, 255, 255);
+                      border-bottom-style: solid;
+                      border-bottom-width: 2px;
+                    "
+                    class="form-control mr-sm-2 search"
+                    @input="seekMovie"
+                    type="search"
+                    placeholder="Rechercher..."
+                    aria-label="Search"
+                    v-model="name"
+                  />
+                </div>
+                <button class="btn my-2 my-sm-0 liked" type="like">
+                  <img src="./assets/img/like.png" alt="" />
+                </button>
+                <button class="btn my-2 my-sm-0 account" type="profil">
+                  <img src="./assets/img/profil.png" alt="" />
+                </button>
+              </form>
+            </div>
+          </nav>
+        </header>
+        <div class="search-container">
+          <div class="title-moovie" v-show="name">
+            <p>Recherche</p>
+            <img src="./assets/img/croix.png" alt="X" @click="returnSearch()" />
+          </div>
+          <div class="wrap">
+            <div
+              :key="search.id"
+              class="moovie-card"
+              v-for="search in listSearch"
+            >
+              <img
+              class="poster":src=`http://image.tmdb.org/t/p/w500${search.poster_path}`
+              >
+              <div class="line1">
+                <h4>{{search.title}}</h4>
+                <p>{{search.release_date}}</p>
+              </div>
+              <div class="line2">
+                <five-stars
+                  v-if="getStars(search.vote_average)==='five-stars'"
+                ></five-stars>
+                <fourth-stars
+                  v-if="getStars(search.vote_average)==='fourth-stars'"
+                ></fourth-stars>
+                <three-stars
+                  v-if="getStars(search.vote_average)==='three-stars'"
+                ></three-stars>
+                <two-stars
+                  v-if="getStars(search.vote_average)==='two-stars'"
+                ></two-stars>
+                <one-star
+                  v-if="getStars(search.vote_average)==='one-star'"
+                ></one-star>
+                <star v-if="getStars(search.vote_average)==='star'"></star>
+                <img src="./assets/img/fav.png" alt="heart-fav" class="heart" />
+              </div>
+              <!-- <p>{{search.overview}}</p> -->
+              <!-- <p>{{search.popularity}}</p> -->
+            </div>
+          </div>
+        </div>
+        <section class="accueil">
+          <div class="icone">
+            <button class="btn btn-outline arrowLeft">
+              <iconify-icon
+                icon="material-symbols:arrow-back-ios-new-rounded"
+                style="color: rgba(255, 255, 255, 0.266)"
+                width="50"
+              ></iconify-icon>
+            </button>
+            <button class="btn btn-outline arrowRight">
+              <iconify-icon
+                icon="material-symbols:arrow-forward-ios-rounded"
+                style="color: rgba(255, 255, 255, 0.259)"
+                width="50"
+              ></iconify-icon>
+            </button>
+          </div>
+          <div class="container">
+            <div class="row">
+              <div class="col-md-3"></div>
+              <div class="col-md-3"></div>
+              <div id="desc" class="col-md-6">
+                <p id="title">AVATAR II</p>
+                <p id="texte"></p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+      <section id="affiche">
+        <div class="title-moovie">
+          <p>A l'affiche</p>
+        </div>
+        <div class="list-pop">
+          <div class="wrap">
+            <div
+              :key="lastmovie.id"
+              v-for="lastmovie in listLastestMovie"
+              class="moovie-card"
+            >
+              <img
+              :src=`https://image.tmdb.org/t/p/w500${lastmovie.poster_path}`
+              alt="" class="poster" />
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="favcard">
+        <div class="title-moovie">
+          <p>Favoris</p>
+          <span></span>
+        </div>
+        <div class="list-pop">
+          <div class="wrap">
+            <div
+              :key="moovie.id"
+              v-for="moovie in listMostPopular"
+              class="moovie-card"
+              v-if="storageId.includes(moovie.id)"
+            >
+              <card-movie
+                :id="moovie.id"
+                :title="moovie.title"
+                :poster_path="moovie.poster_path"
+                @changefav="addFav"
+              ></card-movie>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="pop">
+        <div class="title-moovie">
+          <p>Les plus populaires</p>
+          <span></span>
+        </div>
+        <div class="list-pop">
+          <div class="wrap owl-carousel" v-show="isActive">
+            <div
+              :key="moovie.id"
+              v-for="moovie in listMostPopular"
+              class="moovie-card"
+            >
+              <div class="overlay">
+                <img @mouseover="getoverview" @touchstart="getoverview"
+                @touchend="hideoverview" @mouseleave="hideoverview"
+                :src=`https://image.tmdb.org/t/p/w500${moovie.poster_path}`
+                alt="" class="poster" />
+                <div class="overview-bloc">
+                  <p class="ovtext">
+                    <span class="intext">{{moovie.overview}}</span>
+                  </p>
+                </div>
+              </div>
+              <div class="line1">
+                <h4>{{moovie.title}}</h4>
+                <p>{{moovie.release_date}}</p>
+              </div>
+              <div class="line2">
+                <five-stars
+                  v-if="getStars(moovie.vote_average)==='five-stars'"
+                ></five-stars>
+                <fourth-stars
+                  v-if="getStars(moovie.vote_average)==='fourth-stars'"
+                ></fourth-stars>
+                <three-stars
+                  v-if="getStars(moovie.vote_average)==='three-stars'"
+                ></three-stars>
+                <two-stars
+                  v-if="getStars(moovie.vote_average)==='two-stars'"
+                ></two-stars>
+                <one-star
+                  v-if="getStars(moovie.vote_average)==='one-star'"
+                ></one-star>
+                <star v-if="getStars(moovie.vote_average)==='star'"></star>
+                <img
+                  src="./assets/img/fav.png"
+                  alt="heart-fav"
+                  class="heart"
+                  @click="addFav(moovie.id)"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="wrap" v-show="!isActive">
+            <div
+              :key="moovie.id"
+              v-for="moovie in listMostPopular"
+              class="moovie-card"
+            >
+              <div class="overlay">
+                <img @mouseover="getoverview" @touchstart="getoverview"
+                @touchend="hideoverview" @mouseleave="hideoverview"
+                :src=`https://image.tmdb.org/t/p/w500${moovie.poster_path}`
+                alt="" class="poster" />
+                <div class="overview-bloc">
+                  <p class="ovtext">
+                    <span class="intext">{{moovie.overview}}</span>
+                  </p>
+                </div>
+              </div>
+              <div class="line1">
+                <h4>{{moovie.title}}</h4>
+                <p>{{moovie.release_date}}</p>
+              </div>
+              <div class="line2">
+                <five-stars
+                  v-if="getStars(moovie.vote_average)==='five-stars'"
+                ></five-stars>
+                <fourth-stars
+                  v-if="getStars(moovie.vote_average)==='fourth-stars'"
+                ></fourth-stars>
+                <three-stars
+                  v-if="getStars(moovie.vote_average)==='three-stars'"
+                ></three-stars>
+                <two-stars
+                  v-if="getStars(moovie.vote_average)==='two-stars'"
+                ></two-stars>
+                <one-star
+                  v-if="getStars(moovie.vote_average)==='one-star'"
+                ></one-star>
+                <star v-if="getStars(moovie.vote_average)==='star'"></star>
+                <img
+                  src="./assets/img/fav.png"
+                  alt="heart-fav"
+                  class="heart"
+                  @click="addFav(moovie.id)"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <div class="footerElements">
+        <div class="column1">
+          <img src="assets/img/logo_ost.png" alt="LOGO" width="90px" />
+          <p>
+            Merci à vous ! <br />
+            Grâce à vous notre site fais partis des <br />
+            plus visités et les plus appréciés dans ce <br />domaine !
+          </p>
+          <p>OST TEAM ...</p>
+        </div>
+        <div class="column2">
+          <h3>Navigation</h3>
+          <p><a href="">Accueil </a></p>
+          <p><a href="">Catégorie </a></p>
+          <p><a href=""> Favoris </a></p>
+        </div>
+        <div class="column3">
+          <p>Abonnez-vous à notre Newsletters</p>
+          <br />
+          <form action="">
+            <input
+              style="border: 3px #f24e1e solid"
+              class="form-control"
+              type="text"
+              placeholder="Adresse mail"
+            /><br />
+            <textarea
+              style="border: 3px #f24e1e solid"
+              class="rounded form-control"
+              name=""
+              id=""
+              cols="30"
+              rows="3"
+              placeholder="Votre message ici"
+            ></textarea>
+          </form>
+        </div>
+      </div>
+      <div class="social">
+        <h4>Follow us</h4>
+        <iconify-icon
+          icon="uil:instagram-alt"
+          width="60"
+          style="margin-left: 20px; margin-right: 20px; color: rgb(255, 88, 10)"
+        ></iconify-icon>
+        <iconify-icon
+          inline
+          icon="line-md:discord"
+          width="60"
+          style="margin-left: 20px; margin-right: 20px; color: rgb(255, 88, 10)"
+        ></iconify-icon>
+        <iconify-icon
+          inline
+          icon="radix-icons:github-logo"
+          width="60"
+          style="margin-left: 20px; margin-right: 20px; color: rgb(255, 88, 10)"
+        ></iconify-icon>
+        <iconify-icon
+          inline
+          icon="ri:facebook-circle-fill"
+          width="60"
+          style="margin-left: 20px; margin-right: 20px; color: rgb(255, 88, 10)"
+        ></iconify-icon>
+      </div>
+      <div class="copyright">
+        <p>
+          copyright
+          <a href="http://lamanu.fr" target="_blank" rel="noopener noreferrer">
+            lamanu </a
+          >@ 2022
+        </p>
+      </div>
+    </footer>
+  </body>
+  <script
+    src="https://code.jquery.com/jquery-3.6.3.min.js"
+    integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU="
+    crossorigin="anonymous"
+  ></script>
+  <script
+    type="text/javascript"
+    src="./assets/library/owl/owl.carousel.min.js"
+  ></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.2/axios.js"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.5/iconify-icon.min.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"
+  ></script>
+  <script src="./assets/js/script.js"></script>
+  <img src="./assets/img/Group 8.png" alt="" />
+</html>
